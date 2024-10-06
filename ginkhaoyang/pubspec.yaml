@@ -30,6 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  google_fonts: ^4.0.4
+  liquid_swipe: ^3.1.0
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -62,6 +64,7 @@ flutter:
   assets:
     - lib/images/google.png
     - lib/images/apple.png
+    - lib/images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
