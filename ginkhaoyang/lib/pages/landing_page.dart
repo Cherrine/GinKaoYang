@@ -4,6 +4,7 @@ import 'package:ginkhaoyang/components/register_button.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:ginkhaoyang/utils/fade_page_route.dart';
 import 'package:ginkhaoyang/pages/login_page.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class LandingPage extends StatelessWidget {
   const LandingPage({super.key});
@@ -46,10 +47,10 @@ class LandingPage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Welcome!',
-                            style: TextStyle(
-                              fontSize: 24,
+                            style: GoogleFonts.cabin(
+                              fontSize: 32,
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
                             ),
@@ -58,10 +59,10 @@ class LandingPage extends StatelessWidget {
                               .fadeIn(duration: 500.ms, delay: 300.ms)
                               .moveY(begin: 50, end: 0),
                           const SizedBox(height: 15),
-                          const Text(
+                          Text(
                             'Satisfy your hunger with just a few taps. Sign in to get started!',
-                            style: TextStyle(
-                              fontSize: 16,
+                            style: GoogleFonts.cabin(
+                              fontSize: 18,
                               color: Colors.black54,
                             ),
                           )
