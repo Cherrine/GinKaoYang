@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ginkhaoyang/components/login_button.dart';
 import 'package:ginkhaoyang/components/register_button.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:ginkhaoyang/utils/fade_page_route.dart';
 import 'package:ginkhaoyang/pages/login_page.dart';
 
 class LandingPage extends StatelessWidget {
@@ -8,6 +10,9 @@ class LandingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Define a constant width to match the button width
+    const double contentWidth = 300.0;
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -20,17 +25,57 @@ class LandingPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            const SizedBox(height: 20), // Space at the top
             Expanded(
               flex: 3,
-              child: Center(
-                child: Image.asset(
-                  'lib/images/main_logo.png',
-                  width: 300,
-                  height: 300,
-                  fit: BoxFit.contain,
-                ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'lib/images/main_logo.png',
+                    width: 250,
+                    height: 250,
+                    fit: BoxFit.contain,
+                  ).animate().fadeIn(duration: 500.ms, delay: 300.ms),
+                  const SizedBox(height: 70),
+                  // Align the text and set the same width as the button
+                  Center(
+                    child: SizedBox(
+                      width:
+                          contentWidth, // Set fixed width for text and buttons
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Welcome!',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          )
+                              .animate()
+                              .fadeIn(duration: 500.ms, delay: 300.ms)
+                              .moveY(begin: 50, end: 0),
+                          const SizedBox(height: 15),
+                          const Text(
+                            'Satisfy your hunger with just a few taps. Sign in to get started!',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black54,
+                            ),
+                          )
+                              .animate()
+                              .fadeIn(duration: 500.ms, delay: 400.ms)
+                              .moveY(begin: 50, end: 0),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
+            // Align the login and register buttons
             Expanded(
               flex: 1,
               child: Padding(
@@ -38,20 +83,33 @@ class LandingPage extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    LoginButton(
-                      onPressed: () {
-                        // login action
-                        Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const LoginPage(),
-                        ));
-                      },
-                    ),
+                    Center(
+                      child: Hero(
+                        tag: 'loginButton',
+                        child: SizedBox(
+                          width: contentWidth,
+                          child: LoginButton(
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .pushReplacement(FadePageRoute(
+                                builder: (context) => const LoginPage(),
+                              ));
+                            },
+                          ),
+                        ),
+                      ),
+                    ).animate().fadeIn(duration: 500.ms, delay: 300.ms),
                     const SizedBox(height: 16),
-                    RegisterButton(
-                      onPressed: () {
-                        // Add register action
-                      },
-                    ),
+                    Center(
+                      child: SizedBox(
+                        width: contentWidth, // Set fixed width for the button
+                        child: RegisterButton(
+                          onPressed: () {
+                            // Add register action
+                          },
+                        ),
+                      ),
+                    ).animate().fadeIn(duration: 500.ms, delay: 300.ms),
                   ],
                 ),
               ),
@@ -67,7 +125,7 @@ class LandingPage extends StatelessWidget {
                   style: TextStyle(color: Colors.blue),
                 ),
               ),
-            ),
+            ).animate().fadeIn(duration: 500.ms, delay: 300.ms),
           ],
         ),
       ),
