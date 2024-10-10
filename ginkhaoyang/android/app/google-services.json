@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "794560851744",
+    "project_id": "ginkaoyang-fb446",
+    "storage_bucket": "ginkaoyang-fb446.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:794560851744:android:01884e30619c8d4618f145",
+        "android_client_info": {
+          "package_name": "com.example.ginkhaoyang"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZRV_1xld9YMTcgx4W3pkPAWsRvAbDZ5k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
