@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:ginkhaoyang/pages/home_page.dart';
 import 'package:ginkhaoyang/pages/landing_page.dart';
+import 'package:ginkhaoyang/pages/register.dart'; // Import the registration page
 import 'package:ginkhaoyang/utils/fade_page_route.dart';
 import 'package:ginkhaoyang/components/input_textfield.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -134,6 +135,23 @@ class LoginPage extends StatelessWidget {
                                 style: TextStyle(color: Colors.blue),
                               ),
                             ).animate().fadeIn(delay: 700.ms, duration: 500.ms),
+
+                            const SizedBox(height: 20),
+
+                            // Register button to redirect to Register page
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pushReplacement(
+                                  FadePageRoute(
+                                    builder: (context) => const RegisterPage(),
+                                  ),
+                                );
+                              },
+                              child: const Text(
+                                'Don\'t have an account? Register',
+                                style: TextStyle(color: Colors.blue),
+                              ),
+                            ).animate().fadeIn(delay: 800.ms, duration: 500.ms),
                           ],
                         ),
                       ),
