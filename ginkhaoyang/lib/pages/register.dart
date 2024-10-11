@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'login_page.dart'; // Import your login page
+import 'package:firebase_auth/firebase_auth.dart'; // Firebase Auth for registration
+import 'package:ginkhaoyang/services/Account.dart'; // Account model
+import 'package:ginkhaoyang/services/AppUser.dart'; // Renamed User model to AppUser
+import 'login_page.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -10,57 +13,53 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  // Text controllers for each field
   final TextEditingController emailController = TextEditingController();
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController telephoneController = TextEditingController();
-  String selectedRole = 'customer'; // Default role
-
-  // Method to check if email exists
-  Future<bool> isEmailAlreadyRegistered(String email) async {
-    CollectionReference users = FirebaseFirestore.instance.collection('User');
-    QuerySnapshot result = await users.where('Email', isEqualTo: email).get();
-
-    if (result.docs.isEmpty) {
-      return false; // Email is not registered
-    } else {
-      return true;  // Email already exists
-    }
-  }
+  Role selectedRole = Role.customer; // Default role
 
   // Method to register the user
   Future<void> registerUser() async {
-    bool emailExists = await isEmailAlreadyRegistered(emailController.text);
-
-    if (emailExists) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Email is already registered')),
-      );
-      return;
-    }
-
-    // Create a new user document
-    CollectionReference users = FirebaseFirestore.instance.collection('User');
     try {
-      await users.add({
-        'Email': emailController.text,
-        'created_at': DateTime.now(),
-        'first_name': firstNameController.text,
-        'last_name': lastNameController.text,
-        'password_hash': passwordController.text,  // Consider hashing passwords securely
-        'role': selectedRole,
-        'telephone': telephoneController.text,
-        'user_id': 1,  // Handle user ID generation or use Firestore's auto-ID
-      });
+      // Step 1: Create the user in Firebase Auth
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+              email: emailController.text, password: passwordController.text);
+
+      // Step 2: Create an Account object
+      Account newAccount = Account(
+        password: passwordController.text,  // Storing passwords securely is important, but Firebase already does this.
+        role: selectedRole,
+      );
+
+      // Step 3: Create an AppUser object
+      AppUser newUser = AppUser(
+        firstName: firstNameController.text,
+        lastName: lastNameController.text,
+        email: emailController.text,
+        telephone: telephoneController.text,
+        account: newAccount,
+      );
+
+      // Step 4: Store user data in Firestore
+      CollectionReference users = FirebaseFirestore.instance.collection('User');
+      await users.doc(userCredential.user!.uid).set(newUser.toJson());
+
+      // Notify the user of successful registration
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('User Registered Successfully')),
       );
-    } catch (error) {
-      print("Failed to register user: $error");
+
+      // Step 5: Navigate back to the login page
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+      );
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to Register User')),
+        const SnackBar(content: Text('Failed to register user')),
       );
     }
   }
@@ -96,18 +95,18 @@ class _RegisterPageState extends State<RegisterPage> {
               controller: telephoneController,
               decoration: const InputDecoration(labelText: 'Telephone Number'),
             ),
-            DropdownButtonFormField<String>(
+            DropdownButtonFormField<Role>(
               value: selectedRole,
-              decoration: const InputDecoration(labelText: 'Role'),
               items: const [
-                DropdownMenuItem(value: 'customer', child: Text('Customer')),
-                DropdownMenuItem(value: 'shopkeeper', child: Text('Shopkeeper')),
+                DropdownMenuItem(value: Role.customer, child: Text('Customer')),
+                DropdownMenuItem(value: Role.shopkeeper, child: Text('Shopkeeper')),
               ],
-              onChanged: (value) {
+              onChanged: (Role? value) {
                 setState(() {
                   selectedRole = value!;
                 });
               },
+              decoration: const InputDecoration(labelText: 'Role'),
             ),
             const SizedBox(height: 20),
             ElevatedButton(

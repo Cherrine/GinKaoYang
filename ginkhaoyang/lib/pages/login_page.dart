@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // For Firestore
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:ginkhaoyang/pages/home_page.dart';
 import 'package:ginkhaoyang/pages/landing_page.dart';
-import 'package:ginkhaoyang/pages/register.dart'; // Import the registration page
 import 'package:ginkhaoyang/utils/fade_page_route.dart';
 import 'package:ginkhaoyang/components/input_textfield.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'helloworld_page.dart'; // Import HelloWorld page
+import 'package:firebase_auth/firebase_auth.dart'; // Firebase Auth for login
+import 'package:cloud_firestore/cloud_firestore.dart'; // For fetching user info
+import 'helloworld_page.dart';
+import 'register.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -20,22 +21,35 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  // Method to verify user credentials
+  // Method to verify user credentials with Firebase Auth
   Future<void> loginUser() async {
-    CollectionReference users = FirebaseFirestore.instance.collection('User');
-    QuerySnapshot result = await users
-        .where('Email', isEqualTo: emailController.text)
-        .where('password_hash', isEqualTo: passwordController.text)
-        .get();
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+              email: emailController.text, password: passwordController.text);
 
-    if (result.docs.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid email or password')),
-      );
-    } else {
+      // Fetch user role from Firestore
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('User')
+          .doc(userCredential.user!.uid)
+          .get();
+
+      if (userDoc.exists) {
+        var userData = userDoc.data() as Map<String, dynamic>;
+        String role = userData['account']['role'];
+
+        // Use the role for navigation logic or permission handling
+        print("Logged in as: $role");
+      }
+
+      // Navigate to the next screen after successful login
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HelloWorldPage()),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid email or password')),
       );
     }
   }
@@ -96,12 +110,11 @@ class _LoginPageState extends State<LoginPage> {
                             ).animate().fadeIn(delay: 400.ms, duration: 500.ms),
                             const SizedBox(height: 30),
                             ElevatedButton(
-                              onPressed: loginUser, // Call the login function
+                              onPressed: loginUser,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFFFB9A1C),
                                 foregroundColor: Colors.white,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 15),
+                                padding: const EdgeInsets.symmetric(vertical: 15),
                               ),
                               child: const Text(
                                 'Login',
@@ -144,7 +157,6 @@ class _LoginPageState extends State<LoginPage> {
 
                             const SizedBox(height: 20),
 
-                            // Continue as guest button
                             TextButton(
                               onPressed: () {
                                 Navigator.of(context).pushReplacement(
@@ -158,23 +170,18 @@ class _LoginPageState extends State<LoginPage> {
                                 style: TextStyle(color: Colors.blue),
                               ),
                             ).animate().fadeIn(delay: 700.ms, duration: 500.ms),
-
                             const SizedBox(height: 20),
-
-                            // Register button to redirect to Register page
                             TextButton(
                               onPressed: () {
-                                Navigator.of(context).pushReplacement(
-                                  FadePageRoute(
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
                                     builder: (context) => const RegisterPage(),
                                   ),
                                 );
                               },
-                              child: const Text(
-                                'Don\'t have an account? Register',
-                                style: TextStyle(color: Colors.blue),
-                              ),
-                            ).animate().fadeIn(delay: 800.ms, duration: 500.ms),
+                              child: const Text('Don\'t have an account? Register'),
+                            ),
                           ],
                         ),
                       ),
@@ -186,7 +193,6 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
 
-        // Back button
         SafeArea(
           child: Opacity(
             opacity: 1,
