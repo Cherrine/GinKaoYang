@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'login_page.dart'; // Import your login page
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -17,11 +18,31 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController telephoneController = TextEditingController();
   String selectedRole = 'customer'; // Default role
 
-  // Method to store user data in Firebase Firestore
+  // Method to check if email exists
+  Future<bool> isEmailAlreadyRegistered(String email) async {
+    CollectionReference users = FirebaseFirestore.instance.collection('User');
+    QuerySnapshot result = await users.where('Email', isEqualTo: email).get();
+
+    if (result.docs.isEmpty) {
+      return false; // Email is not registered
+    } else {
+      return true;  // Email already exists
+    }
+  }
+
+  // Method to register the user
   Future<void> registerUser() async {
+    bool emailExists = await isEmailAlreadyRegistered(emailController.text);
+
+    if (emailExists) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Email is already registered')),
+      );
+      return;
+    }
+
     // Create a new user document
     CollectionReference users = FirebaseFirestore.instance.collection('User');
-
     try {
       await users.add({
         'Email': emailController.text,
@@ -92,6 +113,16 @@ class _RegisterPageState extends State<RegisterPage> {
             ElevatedButton(
               onPressed: registerUser,
               child: const Text('Register'),
+            ),
+            const SizedBox(height: 10),
+            TextButton(
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                );
+              },
+              child: const Text('Back to Login'),
             ),
           ],
         ),

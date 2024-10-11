@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // For Firestore
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:ginkhaoyang/pages/home_page.dart';
 import 'package:ginkhaoyang/pages/landing_page.dart';
@@ -6,17 +7,42 @@ import 'package:ginkhaoyang/pages/register.dart'; // Import the registration pag
 import 'package:ginkhaoyang/utils/fade_page_route.dart';
 import 'package:ginkhaoyang/components/input_textfield.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'helloworld_page.dart'; // Import HelloWorld page
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  // Method to verify user credentials
+  Future<void> loginUser() async {
+    CollectionReference users = FirebaseFirestore.instance.collection('User');
+    QuerySnapshot result = await users
+        .where('Email', isEqualTo: emailController.text)
+        .where('password_hash', isEqualTo: passwordController.text)
+        .get();
+
+    if (result.docs.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid email or password')),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HelloWorldPage()),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     const double contentWidth = 350.0;
-
-    // Controllers for the input fields
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
 
     return Stack(
       children: [
@@ -70,9 +96,7 @@ class LoginPage extends StatelessWidget {
                             ).animate().fadeIn(delay: 400.ms, duration: 500.ms),
                             const SizedBox(height: 30),
                             ElevatedButton(
-                              onPressed: () {
-                                // Implement login logic here
-                              },
+                              onPressed: loginUser, // Call the login function
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFFFB9A1C),
                                 foregroundColor: Colors.white,
@@ -89,7 +113,6 @@ class LoginPage extends StatelessWidget {
                             ).animate().fadeIn(delay: 500.ms, duration: 500.ms),
                             const SizedBox(height: 20),
 
-                            // Or Continue with section (moved up)
                             Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 25.0),
@@ -121,7 +144,7 @@ class LoginPage extends StatelessWidget {
 
                             const SizedBox(height: 20),
 
-                            // Continue as guest button (moved down)
+                            // Continue as guest button
                             TextButton(
                               onPressed: () {
                                 Navigator.of(context).pushReplacement(
