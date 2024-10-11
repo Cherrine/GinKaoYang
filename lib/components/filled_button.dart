@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:ginkhaoyang/utils/app_colors.dart';
+import 'package:ginkhaoyang/utils/app_styles.dart';
 
 class CustomButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -20,19 +22,22 @@ class CustomButton extends StatelessWidget {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 16.0),
-          backgroundColor: Colors.orange,
+          backgroundColor: AppColors.mainBlueColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),  // Rounded corners
+          ),
         ),
         child: Text(
           buttonText,
-          style: const TextStyle(
+          style: hindMaduraiStyle.copyWith(
             fontSize: 18,
             color: Colors.white,
             shadows: [
-              Shadow(
+              const Shadow(
                 blurRadius: 3.0,
                 color: Colors.black45,
                 offset: Offset(0, 2),
-              )
+              ),
             ],
           ),
         ),
