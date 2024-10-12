@@ -137,7 +137,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               Expanded(
                                 // Make each button expand equally
                                 child: ToggleButton(
-                                  text: 'Agent',
+                                  text: 'Customer',
                                   isSelected: !isMerchantSelected,
                                   onPressed: () {
                                     setState(() {
