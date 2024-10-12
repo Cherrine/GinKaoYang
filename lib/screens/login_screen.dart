@@ -3,7 +3,7 @@ import 'package:ginkhaoyang/utils/app_colors.dart';
 import 'package:ginkhaoyang/utils/app_icons.dart';
 import 'package:ginkhaoyang/utils/app_styles.dart';
 import 'package:ginkhaoyang/components/sign_in_google_button.dart';
-import 'package:ginkhaoyang/components/filled_button.dart';
+import 'package:ginkhaoyang/components/confusing_filled_button.dart';
 import 'package:ginkhaoyang/utils/responsive_widget.dart';
 import 'package:ginkhaoyang/screens/register_screen.dart';
 
@@ -243,7 +243,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           borderRadius: BorderRadius.circular(16.0),
                           child: Ink(
                             padding: const EdgeInsets.symmetric(vertical: 18.0),
-                            child: CustomButton(
+                            child: ConfusingFilledButton(
                               onPressed: () {},
                               buttonText: 'Sign In',
                               width: 200.0,

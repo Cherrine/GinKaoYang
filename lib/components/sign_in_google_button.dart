@@ -25,7 +25,7 @@ class SignInGoogleButton extends StatelessWidget {
           backgroundColor: AppColors.whiteColor,  // White background for Google button
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.0),  // Rounded corners
-            side: BorderSide(color: AppColors.mainBlueColor),  // Optional: Add border
+            side: const BorderSide(color: AppColors.mainBlueColor),  // Optional: Add border
           ),
         ),
         child: Row(

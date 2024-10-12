@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:ginkhaoyang/utils/app_colors.dart';
 import 'package:ginkhaoyang/utils/app_styles.dart';
 
-class CustomButton extends StatelessWidget {
+class ConfusingFilledButton extends StatelessWidget {
   final VoidCallback onPressed;
   final String buttonText;
   final double? width;
 
-  const CustomButton({
+  const ConfusingFilledButton({
     super.key,
     required this.onPressed,
     required this.buttonText,

@@ -3,7 +3,7 @@ import 'package:ginkhaoyang/screens/login_screen.dart';
 import 'package:ginkhaoyang/utils/app_colors.dart';
 import 'package:ginkhaoyang/utils/app_styles.dart';
 import 'package:ginkhaoyang/components/sign_in_google_button.dart';
-import 'package:ginkhaoyang/components/filled_button.dart';
+import 'package:ginkhaoyang/components/confusing_filled_button.dart';
 import 'package:ginkhaoyang/utils/responsive_widget.dart';
 import 'package:ginkhaoyang/components/toggle_button.dart';
 
@@ -500,7 +500,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             child: Ink(
                               padding:
                                   const EdgeInsets.symmetric(vertical: 18.0),
-                              child: CustomButton(
+                              child: ConfusingFilledButton(
                                 onPressed: () {},
                                 buttonText: 'Sign up',
                                 width: 200.0, // Set width as desired
