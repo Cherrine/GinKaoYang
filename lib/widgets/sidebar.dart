@@ -96,13 +96,17 @@ class _SidebarState extends State<Sidebar> {
             icon: const Icon(Icons.logout, color: Colors.white),
             onPressed: _handleLogout,
           ),
-          AnimatedOpacity(
-            opacity: isCollapsed ? 0 : 1,
-            duration: const Duration(milliseconds: 200),
-            child: Text(
-              'Logout',
-              style: catamaranStyle.copyWith(color: Colors.white),
-              overflow: TextOverflow.ellipsis,
+          // Wrap the Text in an InkWell or GestureDetector
+          InkWell(
+            onTap: _handleLogout, // Call _handleLogout when tapped
+            child: AnimatedOpacity(
+              opacity: isCollapsed ? 0 : 1,
+              duration: const Duration(milliseconds: 200),
+              child: Text(
+                'Logout',
+                style: catamaranStyle.copyWith(color: Colors.white),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ),
         ],
