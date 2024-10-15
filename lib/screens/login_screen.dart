@@ -3,7 +3,7 @@ import 'package:ginkhaoyang/utils/app_colors.dart';
 import 'package:ginkhaoyang/utils/app_icons.dart';
 import 'package:ginkhaoyang/utils/app_styles.dart';
 import 'package:ginkhaoyang/components/sign_in_google_button.dart';
-import 'package:ginkhaoyang/components/confusing_filled_button.dart';
+import 'package:ginkhaoyang/components/confusing_filled_button.dart' as SignInButton;
 import 'package:ginkhaoyang/screens/register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -60,13 +60,13 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 90),
+          const SizedBox(height: 90),
           Text('Let\'s Sign In!', style: montserratStyle.copyWith(fontSize: 34.0, fontWeight: FontWeight.w900, color: AppColors.blueDarkColor)),
-          SizedBox(height: 30),
+          const SizedBox(height: 30),
           Text('Welcome Back! You\'ve been missed!', style: catamaranStyle.copyWith(fontSize: 18.0, color: AppColors.textColor)),
-          SizedBox(height: 50),
+          const SizedBox(height: 50),
           _buildTextField(icon: AppIcons.usernameIcon, hintText: 'Enter Username'),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           _buildTextField(icon: AppIcons.lockIcon, hintText: 'Enter Password', isPassword: true),
           Align(
             alignment: Alignment.centerRight,
@@ -75,13 +75,13 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Text('Forgot Password?', style: hindMaduraiStyle.copyWith(fontSize: 16.0, color: AppColors.mainBlueColor, fontWeight: FontWeight.w600)),
             ),
           ),
-          SizedBox(height: 20),
-          Center(child: ConfusingFilledButton(onPressed: () {}, buttonText: 'Sign In', width: 200.0)),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
+          Center(child: SignInButton.ConfusingFilledButton(onPressed: () {}, buttonText: 'Sign In', width: 200.0)),
+          const SizedBox(height: 20),
           _buildDivider(), 
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Center(child: SignInGoogleButton(onPressed: () {}, buttonText: 'Sign in with Google', width: 250)),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           _buildSignUpLink(context),
         ],
       ),
