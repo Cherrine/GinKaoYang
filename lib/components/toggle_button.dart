@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ginkhaoyang/utils/responsive_widget.dart'; // Import the ResponsiveWidget
+import 'package:ginkhaoyang/widgets/responsive_widget.dart'; // Import the ResponsiveWidget
 
 class ToggleButton extends StatelessWidget {
   final String text;
