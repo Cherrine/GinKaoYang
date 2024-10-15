@@ -1,15 +1,15 @@
-// lib/screens/register_screen.dart
 import 'package:flutter/material.dart';
 import 'package:ginkhaoyang/screens/login_screen.dart';
 import 'package:ginkhaoyang/utils/app_colors.dart';
 import 'package:ginkhaoyang/utils/app_styles.dart';
 import 'package:ginkhaoyang/components/sign_in_google_button.dart';
-import 'package:ginkhaoyang/components/confusing_filled_button.dart' as SignUpButton;
+import 'package:ginkhaoyang/components/confusing_filled_button.dart' as signupbutton;
 import 'package:ginkhaoyang/components/toggle_button.dart';
 import 'package:ginkhaoyang/components/common_background.dart';
+import 'package:ginkhaoyang/utils/fade_page_route.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
+  const RegisterScreen({super.key});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -26,17 +26,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
       backgroundColor: AppColors.backColor,
       body: LayoutBuilder(
         builder: (context, constraints) {
-          bool showImage = constraints.maxWidth >= 600;
+          double imageRatio = constraints.maxWidth >= 1400
+              ? 0.6
+              : (constraints.maxWidth >= 800 ? 0.5 : 0);
+
           return Row(
             children: [
-              if (showImage)
+              if (imageRatio > 0)
                 Expanded(
-                  child: CommonBackground(fontSize: 48.0),
+                  flex: (imageRatio * 100).round(),
+                  child: const CommonBackground(fontSize: 48.0),
                 ),
               Expanded(
+                flex: ((1 - imageRatio) * 100).round(),
                 child: Padding(
                   padding: EdgeInsets.all(constraints.maxWidth * 0.05),
-                  child: _buildRegisterForm(context, constraints),
+                  child: _buildRegisterForm(context),
                 ),
               ),
             ],
@@ -46,95 +51,95 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildRegisterForm(BuildContext context, BoxConstraints constraints) {
+  Widget _buildRegisterForm(BuildContext context) {
     return Center(
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: 500),
+        constraints: const BoxConstraints(maxWidth: 500),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Register',
-              style: montserratStyle.copyWith(
-                fontSize: 34.0,
-                fontWeight: FontWeight.w800,
-                color: AppColors.blueDarkColor,
-              ),
-            ),
+            _buildTitle(),
             const SizedBox(height: 20),
-            Text(
-              'New here? Create an account to start exploring!',
-              style: catamaranStyle.copyWith(
-                fontSize: 18.0,
-                color: AppColors.textColor,
-              ),
-            ),
+            _buildSubtitle(),
             const SizedBox(height: 20),
             _buildToggleButtons(),
             const SizedBox(height: 20),
             _buildTextField(label: 'Email', hint: 'Enter Email'),
             const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(child: _buildTextField(label: 'First name', hint: 'Enter First name')),
-                const SizedBox(width: 10),
-                Expanded(child: _buildTextField(label: 'Last name', hint: 'Enter Last name')),
-              ],
-            ),
+            _buildNameFields(),
             const SizedBox(height: 10),
             _buildTextField(label: 'Phone number', hint: 'Enter Phone number'),
             const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextField(
-                    label: 'Password',
-                    hint: 'Enter Password',
-                    isPassword: true,
-                    obscureText: isPasswordObscured,
-                    onToggleVisibility: () => setState(
-                      () => isPasswordObscured = !isPasswordObscured,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _buildTextField(
-                    label: 'Confirm Password',
-                    hint: 'Confirm Password',
-                    isPassword: true,
-                    obscureText: isConfirmPasswordObscured,
-                    onToggleVisibility: () => setState(
-                      () => isConfirmPasswordObscured = !isConfirmPasswordObscured,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            _buildPasswordFields(),
             const SizedBox(height: 20),
-            Center(
-              child: SignUpButton.ConfusingFilledButton(
-                onPressed: () {},
-                buttonText: 'Sign up',
-                width: 200.0,
-              ),
-            ),
+            _buildSignUpButton(),
             const SizedBox(height: 20),
             _buildDivider(),
             const SizedBox(height: 20),
-            Center(
-              child: SignInGoogleButton(
-                onPressed: () {},
-                buttonText: 'Sign up with Google',
-                width: 250,
-              ),
-            ),
+            _buildGoogleSignUpButton(),
             const SizedBox(height: 20),
             _buildSignInLink(context),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTitle() {
+    return Text(
+      'Register',
+      style: montserratStyle.copyWith(
+        fontSize: 34.0,
+        fontWeight: FontWeight.w800,
+        color: AppColors.blueDarkColor,
+      ),
+    );
+  }
+
+  Widget _buildSubtitle() {
+    return Text(
+      'New here? Create an account to start exploring!',
+      style: catamaranStyle.copyWith(
+        fontSize: 18.0,
+        color: AppColors.textColor,
+      ),
+    );
+  }
+
+  Widget _buildNameFields() {
+    return Row(
+      children: [
+        Expanded(child: _buildTextField(label: 'First name', hint: 'Enter First name')),
+        const SizedBox(width: 10),
+        Expanded(child: _buildTextField(label: 'Last name', hint: 'Enter Last name')),
+      ],
+    );
+  }
+
+  Widget _buildPasswordFields() {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildTextField(
+            label: 'Password',
+            hint: 'Enter Password',
+            isPassword: true,
+            obscureText: isPasswordObscured,
+            onToggleVisibility: () => setState(() => isPasswordObscured = !isPasswordObscured),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _buildTextField(
+            label: 'Confirm Password',
+            hint: 'Confirm Password',
+            isPassword: true,
+            obscureText: isConfirmPasswordObscured,
+            onToggleVisibility: () => setState(() => isConfirmPasswordObscured = !isConfirmPasswordObscured),
+          ),
+        ),
+      ],
     );
   }
 
@@ -148,7 +153,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             onPressed: () => setState(() => isMerchantSelected = true),
           ),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 10), // Space between buttons
         Expanded(
           child: ToggleButton(
             text: 'Customer',
@@ -188,8 +193,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: TextFormField(
             obscureText: isPassword ? obscureText : false,
             decoration: InputDecoration(
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
               border: InputBorder.none,
               hintText: hint,
               hintStyle: hindMaduraiStyle.copyWith(
@@ -213,19 +217,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  Widget _buildSignUpButton() {
+    return Center(
+      child: signupbutton.ConfusingFilledButton(
+        onPressed: () {},
+        buttonText: 'Sign up',
+        width: 200.0,
+      ),
+    );
+  }
+
+  Widget _buildGoogleSignUpButton() {
+    return Center(
+      child: SignInGoogleButton(
+        onPressed: () {},
+        buttonText: 'Sign up with Google',
+        width: 250,
+      ),
+    );
+  }
+
   Widget _buildDivider() {
     return const Row(
       children: [
-        Expanded(
-          child: Divider(color: Colors.grey, thickness: 1.0, endIndent: 10.0),
-        ),
-        Text(
-          "OR",
-          style: TextStyle(color: Colors.grey, fontSize: 14.0),
-        ),
-        Expanded(
-          child: Divider(color: Colors.grey, thickness: 1.0, indent: 10.0),
-        ),
+        Expanded(child: Divider(color: Colors.grey, thickness: 1.0, endIndent: 10.0)),
+        Text("OR", style: TextStyle(color: Colors.grey, fontSize: 14.0)),
+        Expanded(child: Divider(color: Colors.grey, thickness: 1.0, indent: 10.0)),
       ],
     );
   }
@@ -243,10 +260,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
         TextButton(
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const LoginScreen()),
-          ),
+          onPressed: () => Navigator.of(context).push(FadePageRoute(page: const LoginScreen())),
           child: Text(
             'Sign In',
             style: hindMaduraiStyle.copyWith(

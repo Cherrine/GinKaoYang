@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ginkhaoyang/screens/login_screen.dart';
+import 'package:ginkhaoyang/screens/home_screen.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
         fontFamily: 'Poppins',
       ),
-      home: const LoginScreen(), // Set HomePage as the home
+      home: const HomeScreen(), // Set HomePage as the home
       debugShowCheckedModeBanner: false,
     );
   }

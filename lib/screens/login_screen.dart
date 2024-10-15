@@ -1,12 +1,12 @@
-
 import 'package:flutter/material.dart';
 import 'package:ginkhaoyang/utils/app_colors.dart';
 import 'package:ginkhaoyang/utils/app_icons.dart';
 import 'package:ginkhaoyang/utils/app_styles.dart';
 import 'package:ginkhaoyang/components/sign_in_google_button.dart';
-import 'package:ginkhaoyang/components/confusing_filled_button.dart' as SignInButton;
+import 'package:ginkhaoyang/components/confusing_filled_button.dart' as signinbutton;
 import 'package:ginkhaoyang/screens/register_screen.dart';
 import 'package:ginkhaoyang/components/common_background.dart';
+import 'package:ginkhaoyang/utils/fade_page_route.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -52,76 +52,53 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildLoginForm(BuildContext context) {
     return Center(
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: 400),
+        constraints: const BoxConstraints(maxWidth: 400),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 70),
-            Text(
-              'Let\'s Sign In!',
-              style: montserratStyle.copyWith(
-                fontSize: 34.0,
-                fontWeight: FontWeight.w900,
-                color: AppColors.blueDarkColor,
-              ),
-            ),
-            const SizedBox(height: 30),
-            Text(
-              'Welcome Back! You\'ve been missed!',
-              style: catamaranStyle.copyWith(
-                fontSize: 18.0,
-                color: AppColors.textColor,
-              ),
-            ),
+            _buildHeader(),
             const SizedBox(height: 50),
-            _buildTextField(
-              icon: AppIcons.usernameIcon,
-              hintText: 'Enter Username',
-            ),
+            _buildTextField(icon: AppIcons.usernameIcon, hintText: 'Enter Username'),
             const SizedBox(height: 20),
-            _buildTextField(
-              icon: AppIcons.lockIcon,
-              hintText: 'Enter Password',
-              isPassword: true,
-            ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () {},
-                child: Text(
-                  'Forgot Password?',
-                  style: hindMaduraiStyle.copyWith(
-                    fontSize: 16.0,
-                    color: AppColors.mainBlueColor,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
+            _buildTextField(icon: AppIcons.lockIcon, hintText: 'Enter Password', isPassword: true),
+            _buildForgotPasswordLink(),
             const SizedBox(height: 20),
-            Center(
-              child: SignInButton.ConfusingFilledButton(
-                onPressed: () {},
-                buttonText: 'Sign In',
-                width: 200.0,
-              ),
-            ),
+            _buildSignInButton(),
             const SizedBox(height: 20),
             _buildDivider(),
             const SizedBox(height: 20),
-            Center(
-              child: SignInGoogleButton(
-                onPressed: () {},
-                buttonText: 'Sign in with Google',
-                width: 250,
-              ),
-            ),
+            _buildGoogleSignInButton(),
             const SizedBox(height: 20),
             _buildSignUpLink(context),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Let\'s Sign In!',
+          style: montserratStyle.copyWith(
+            fontSize: 34.0,
+            fontWeight: FontWeight.w900,
+            color: AppColors.blueDarkColor,
+          ),
+        ),
+        const SizedBox(height: 30),
+        Text(
+          'Welcome Back! You\'ve been missed!',
+          style: catamaranStyle.copyWith(
+            fontSize: 18.0,
+            color: AppColors.textColor,
+          ),
+        ),
+      ],
     );
   }
 
@@ -142,24 +119,9 @@ class _LoginScreenState extends State<LoginScreen> {
           border: InputBorder.none,
           prefixIcon: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            child: Image.asset(
-              icon,
-              width: 24,
-              height: 24,
-              fit: BoxFit.contain,
-            ),
+            child: Image.asset(icon, width: 24, height: 24, fit: BoxFit.contain),
           ),
-          suffixIcon: isPassword
-              ? IconButton(
-                  icon: Icon(
-                    _isPasswordObscured
-                        ? Icons.visibility_off
-                        : Icons.visibility,
-                  ),
-                  onPressed: () =>
-                      setState(() => _isPasswordObscured = !_isPasswordObscured),
-                )
-              : null,
+          suffixIcon: isPassword ? _buildPasswordVisibilityToggle() : null,
           hintText: hintText,
           hintStyle: hindMaduraiStyle.copyWith(
             fontWeight: FontWeight.w400,
@@ -171,20 +133,57 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  Widget _buildPasswordVisibilityToggle() {
+    return IconButton(
+      icon: Icon(_isPasswordObscured ? Icons.visibility_off : Icons.visibility),
+      onPressed: () => setState(() => _isPasswordObscured = !_isPasswordObscured),
+    );
+  }
+
+  Widget _buildForgotPasswordLink() {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: TextButton(
+        onPressed: () {},
+        child: Text(
+          'Forgot Password?',
+          style: hindMaduraiStyle.copyWith(
+            fontSize: 16.0,
+            color: AppColors.mainBlueColor,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSignInButton() {
+    return Center(
+      child: signinbutton.ConfusingFilledButton(
+        onPressed: () {},
+        buttonText: 'Sign In',
+        width: 200.0,
+      ),
+    );
+  }
+
   Widget _buildDivider() {
     return const Row(
       children: [
-        Expanded(
-          child: Divider(color: Colors.grey, thickness: 1.0, endIndent: 10.0),
-        ),
-        Text(
-          "OR",
-          style: TextStyle(color: Colors.grey, fontSize: 14.0),
-        ),
-        Expanded(
-          child: Divider(color: Colors.grey, thickness: 1.0, indent: 10.0),
-        ),
+        Expanded(child: Divider(color: Colors.grey, thickness: 1.0, endIndent: 10.0)),
+        Text("OR", style: TextStyle(color: Colors.grey, fontSize: 14.0)),
+        Expanded(child: Divider(color: Colors.grey, thickness: 1.0, indent: 10.0)),
       ],
+    );
+  }
+
+  Widget _buildGoogleSignInButton() {
+    return Center(
+      child: SignInGoogleButton(
+        onPressed: () {},
+        buttonText: 'Sign in with Google',
+        width: 250,
+      ),
     );
   }
 
@@ -201,10 +200,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
         TextButton(
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const RegisterScreen()),
-          ),
+          onPressed: () => Navigator.of(context).push(FadePageRoute(page: const RegisterScreen())),
           child: Text(
             'Sign Up',
             style: hindMaduraiStyle.copyWith(
