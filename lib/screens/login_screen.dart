@@ -7,6 +7,9 @@ import 'package:ginkhaoyang/components/confusing_filled_button.dart' as signinbu
 import 'package:ginkhaoyang/screens/register_screen.dart';
 import 'package:ginkhaoyang/components/common_background.dart';
 import 'package:ginkhaoyang/utils/fade_page_route.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:ginkhaoyang/screens/home_screen.dart'; // Make sure to import your HomeScreen
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -160,7 +163,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildSignInButton() {
     return Center(
       child: signinbutton.ConfusingFilledButton(
-        onPressed: () {},
+        onPressed: () {}, // Implement your sign in logic here if needed
         buttonText: 'Sign In',
         width: 200.0,
       ),
@@ -180,7 +183,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildGoogleSignInButton() {
     return Center(
       child: SignInGoogleButton(
-        onPressed: () {},
+        onPressed: _signInWithGoogle, // Call the sign-in method
         buttonText: 'Sign in with Google',
         width: 250,
       ),
@@ -212,5 +215,37 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ],
     );
+  }
+
+  // Method to handle Google Sign-In
+  Future<void> _signInWithGoogle() async {
+    try {
+      // Trigger the authentication flow
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
+
+      // Create a new credential
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // This token can be used to authenticate with Firebase
+      await FirebaseAuth.instance.signInWithCredential(credential);
+
+      // Redirect to HomeScreen after successful sign in
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const HomeScreen()), // Adjust the import as necessary
+      );
+    } catch (error) {
+      // Handle error
+      print("Google Sign-In Error: $error");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error signing in with Google')),
+      );
+    }
   }
 }

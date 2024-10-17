@@ -70,22 +70,23 @@ class _SidebarState extends State<Sidebar> {
     );
   }
 
-  Widget _buildHeaderTitle() {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.only(left: 20.0),
-        child: AnimatedOpacity(
-          opacity: isCollapsed ? 0 : 1,
-          duration: const Duration(milliseconds: 200),
-          child: Text(
-            'GinKhaoYang',
-            style: montserratStyle.copyWith(color: Colors.white, fontSize: 18),
-            overflow: TextOverflow.ellipsis,
-          ),
+Widget _buildHeaderTitle() {
+  return Expanded(
+    child: Padding(
+      padding: const EdgeInsets.only(left: 10.0),
+      child: AnimatedOpacity(
+        opacity: isCollapsed ? 0 : 1,
+        duration: const Duration(milliseconds: 200),
+        child: Image.asset(
+          'assets/images/namedlogo.png', // Replace with your image path
+          height: 30,  // Adjust the height to make it smaller
+          width: 30,   // You can also control the width if needed
+          fit: BoxFit.contain, // Ensure the image fits within the space
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildLogoutButton() {
     return Padding(

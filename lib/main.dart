@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:ginkhaoyang/screens/home_screen.dart';
+import 'package:ginkhaoyang/screens/login_screen.dart';
+
+void main() {
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -16,8 +21,4 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
     );
   }
-}
-
-void main() {
-  runApp(const MyApp());
 }
