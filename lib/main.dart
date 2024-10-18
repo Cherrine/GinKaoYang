@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:ginkhaoyang/screens/home_screen.dart';
 import 'package:ginkhaoyang/screens/login_screen.dart';
 
 
@@ -18,7 +17,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
         fontFamily: 'Poppins',
       ),
-      home: const HomeScreen(), // Set HomePage as the home
+      home: const LoginScreen(), // Set HomePage as the home
       debugShowCheckedModeBanner: false,
     );
   }
