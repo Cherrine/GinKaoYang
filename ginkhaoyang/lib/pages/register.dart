@@ -3,129 +3,320 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Firebase Auth for registration
 import 'package:ginkhaoyang/services/Account.dart'; // Account model
 import 'package:ginkhaoyang/services/AppUser.dart'; // Renamed User model to AppUser
+import '../services/Account.dart';
 import 'login_page.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
-
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
   @override
-  _RegisterPageState createState() => _RegisterPageState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController firstNameController = TextEditingController();
-  final TextEditingController lastNameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController telephoneController = TextEditingController();
-  Role selectedRole = Role.customer; // Default role
+class _RegisterScreenState extends State<RegisterScreen> {
+  final TextEditingController emailControl = TextEditingController();
+  final TextEditingController fNameControl = TextEditingController();
+  final TextEditingController lNameControl = TextEditingController();
+  final TextEditingController phoneControl = TextEditingController();
+  final TextEditingController passwordControl = TextEditingController();
+  final TextEditingController cPasswordControl = TextEditingController();
 
-  // Method to register the user
-  Future<void> registerUser() async {
-    try {
-      // Step 1: Create the user in Firebase Auth
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-              email: emailController.text, password: passwordController.text);
+  bool isMerchantSelected = true;
+  bool isPasswordObscured = true;
+  bool isConfirmPasswordObscured = true;
 
-      // Step 2: Create an Account object
-      Account newAccount = Account(
-        password: passwordController.text,  // Storing passwords securely is important, but Firebase already does this.
-        role: selectedRole,
-      );
+  final Account account = Account();
 
-      // Step 3: Create an AppUser object
-      AppUser newUser = AppUser(
-        firstName: firstNameController.text,
-        lastName: lastNameController.text,
-        email: emailController.text,
-        telephone: telephoneController.text,
-        account: newAccount,
-      );
+  Future<void> signUpAction() async {
+    Timestamp createdAt = Timestamp.now();
+    if (passwordControl.text != cPasswordControl.text) {
+      print("passwords not match");
+      return;
+    }
 
-      // Step 4: Store user data in Firestore
-      CollectionReference users = FirebaseFirestore.instance.collection('User');
-      await users.doc(userCredential.user!.uid).set(newUser.toJson());
-
-      // Notify the user of successful registration
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User Registered Successfully')),
-      );
-
-      // Step 5: Navigate back to the login page
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to register user')),
-      );
+    int result = await account.register(
+      emailControl.text,
+      passwordControl.text,
+      fNameControl.text,
+      lNameControl.text,
+      phoneControl.text,
+      isMerchantSelected,
+      createdAt,
+    );
+    if (result == 0) {
+      print('reg');
+    } else {
+      print('fail');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Register'),
+      backgroundColor: AppColors.backColor,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          double imageRatio = constraints.maxWidth >= 1400
+              ? 0.6
+              : (constraints.maxWidth >= 800 ? 0.5 : 0);
+
+          return Row(
+            children: [
+              if (imageRatio > 0)
+                Expanded(
+                  flex: (imageRatio * 100).round(),
+                  child: const CommonBackground(fontSize: 48.0),
+                ),
+              Expanded(
+                flex: ((1 - imageRatio) * 100).round(),
+                child: Padding(
+                  padding: EdgeInsets.all(constraints.maxWidth * 0.05),
+                  child: _buildRegisterForm(context),
+                ),
+              ),
+            ],
+          );
+        },
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+    );
+  }
+
+  Widget _buildRegisterForm(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 500),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
-              controller: emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
-            ),
-            TextField(
-              controller: firstNameController,
-              decoration: const InputDecoration(labelText: 'First Name'),
-            ),
-            TextField(
-              controller: lastNameController,
-              decoration: const InputDecoration(labelText: 'Last Name'),
-            ),
-            TextField(
-              controller: passwordController,
-              decoration: const InputDecoration(labelText: 'Password'),
-              obscureText: true,
-            ),
-            TextField(
-              controller: telephoneController,
-              decoration: const InputDecoration(labelText: 'Telephone Number'),
-            ),
-            DropdownButtonFormField<Role>(
-              value: selectedRole,
-              items: const [
-                DropdownMenuItem(value: Role.customer, child: Text('Customer')),
-                DropdownMenuItem(value: Role.shopkeeper, child: Text('Shopkeeper')),
-              ],
-              onChanged: (Role? value) {
-                setState(() {
-                  selectedRole = value!;
-                });
-              },
-              decoration: const InputDecoration(labelText: 'Role'),
-            ),
+            _buildTitle(),
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: registerUser,
-              child: const Text('Register'),
-            ),
+            _buildSubtitle(),
+            const SizedBox(height: 20),
+            _buildToggleButtons(),
+            const SizedBox(height: 20),
+            _buildTextField(
+                label: 'Email', hint: 'Enter Email', controller: emailControl),
             const SizedBox(height: 10),
-            TextButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                );
-              },
-              child: const Text('Back to Login'),
-            ),
+            _buildNameFields(),
+            const SizedBox(height: 10),
+            _buildTextField(
+                label: 'Phone number',
+                hint: 'Enter Phone number',
+                controller: phoneControl),
+            const SizedBox(height: 10),
+            _buildPasswordFields(),
+            const SizedBox(height: 20),
+            _buildSignUpButton(),
+            const SizedBox(height: 20),
+            _buildDivider(),
+            const SizedBox(height: 20),
+            _buildGoogleSignUpButton(),
+            const SizedBox(height: 20),
+            _buildSignInLink(context),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTitle() {
+    return Text(
+      'Register',
+      style: montserratStyle.copyWith(
+        fontSize: 34.0,
+        fontWeight: FontWeight.w800,
+        color: AppColors.blueDarkColor,
+      ),
+    );
+  }
+
+  Widget _buildSubtitle() {
+    return Text(
+      'New here? Create an account to start exploring!',
+      style: catamaranStyle.copyWith(
+        fontSize: 18.0,
+        color: AppColors.textColor,
+      ),
+    );
+  }
+
+  Widget _buildNameFields() {
+    return Row(
+      children: [
+        Expanded(
+            child: _buildTextField(
+                label: 'First name',
+                hint: 'Enter First name',
+                controller: fNameControl)),
+        const SizedBox(width: 10),
+        Expanded(
+            child: _buildTextField(
+                label: 'Last name',
+                hint: 'Enter Last name',
+                controller: lNameControl)),
+      ],
+    );
+  }
+
+  Widget _buildPasswordFields() {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildTextField(
+            label: 'Password',
+            hint: 'Enter Password',
+            isPassword: true,
+            obscureText: isPasswordObscured,
+            controller: passwordControl,
+            onToggleVisibility: () =>
+                setState(() => isPasswordObscured = !isPasswordObscured),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _buildTextField(
+            label: 'Confirm Password',
+            hint: 'Confirm Password',
+            isPassword: true,
+            obscureText: isConfirmPasswordObscured,
+            controller: cPasswordControl,
+            onToggleVisibility: () => setState(
+                () => isConfirmPasswordObscured = !isConfirmPasswordObscured),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildToggleButtons() {
+    return Row(
+      children: [
+        Expanded(
+          child: ToggleButton(
+            text: 'Merchant',
+            isSelected: isMerchantSelected,
+            onPressed: () => setState(() => isMerchantSelected = true),
+          ),
+        ),
+        const SizedBox(width: 10), // Space between buttons
+        Expanded(
+          child: ToggleButton(
+            text: 'Customer',
+            isSelected: !isMerchantSelected,
+            onPressed: () => setState(() => isMerchantSelected = false),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTextField({
+    required String label,
+    required String hint,
+    required TextEditingController controller,
+    bool isPassword = false,
+    bool obscureText = false,
+    VoidCallback? onToggleVisibility,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: hindMaduraiStyle.copyWith(
+            fontSize: 18.0,
+            fontWeight: FontWeight.w800,
+            color: AppColors.blueDarkColor,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Container(
+          height: 50.0,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16.0),
+            color: AppColors.whiteColor,
+          ),
+          child: TextFormField(
+            controller: controller,
+            obscureText: isPassword ? obscureText : false,
+            decoration: InputDecoration(
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              border: InputBorder.none,
+              hintText: hint,
+              suffixIcon: isPassword
+                  ? IconButton(
+                      icon: Icon(obscureText
+                          ? Icons.visibility
+                          : Icons.visibility_off),
+                      onPressed: onToggleVisibility,
+                    )
+                  : null,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSignUpButton() {
+    return Center(
+      child: signupbutton.ConfusingFilledButton(
+        onPressed: signUpAction,
+        buttonText: 'Sign up',
+        width: 200.0,
+      ),
+    );
+  }
+
+  Widget _buildGoogleSignUpButton() {
+    return Center(
+      child: SignInGoogleButton(
+        onPressed: () {},
+        buttonText: 'Sign up with Google',
+        width: 250,
+      ),
+    );
+  }
+
+  Widget _buildDivider() {
+    return const Row(
+      children: [
+        Expanded(
+            child:
+                Divider(color: Colors.grey, thickness: 1.0, endIndent: 10.0)),
+        Text("OR", style: TextStyle(color: Colors.grey, fontSize: 14.0)),
+        Expanded(
+            child: Divider(color: Colors.grey, thickness: 1.0, indent: 10.0)),
+      ],
+    );
+  }
+
+  Widget _buildSignInLink(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          "Already have an account?",
+          style: hindMaduraiStyle.copyWith(
+            fontSize: 16.0,
+            color: AppColors.textColor,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context)
+              .push(FadePageRoute(page: const LoginScreen())),
+          child: Text(
+            'Sign In',
+            style: hindMaduraiStyle.copyWith(
+              fontSize: 16.0,
+              color: AppColors.mainBlueColor,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

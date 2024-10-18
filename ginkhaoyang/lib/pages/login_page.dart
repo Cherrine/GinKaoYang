@@ -10,205 +10,237 @@ import 'package:cloud_firestore/cloud_firestore.dart'; // For fetching user info
 import 'helloworld_page.dart';
 import 'register.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+class _LoginScreenState extends State<LoginScreen> {
+  bool _isPasswordObscured = true;
+  final TextEditingController emailControl = TextEditingController();
+  final TextEditingController passwordControl = TextEditingController();
+  final Account account = Account();
 
-  // Method to verify user credentials with Firebase Auth
-  Future<void> loginUser() async {
-    try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(
-              email: emailController.text, password: passwordController.text);
-
-      // Fetch user role from Firestore
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('User')
-          .doc(userCredential.user!.uid)
-          .get();
-
-      if (userDoc.exists) {
-        var userData = userDoc.data() as Map<String, dynamic>;
-        String role = userData['account']['role'];
-
-        // Use the role for navigation logic or permission handling
-        print("Logged in as: $role");
-      }
-
-      // Navigate to the next screen after successful login
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HelloWorldPage()),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid email or password')),
-      );
+  Future<void> signInAction() async {
+    String? uid = await account.login(
+      emailControl.text,
+      passwordControl.text,
+    );
+    User currentuser = User(uid!);
+    await currentuser.fetchUserData();
+    if (uid != null) {
+      print('login');
+    } else {
+      print('fail');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    const double contentWidth = 350.0;
+    return Scaffold(
+      backgroundColor: AppColors.backColor,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          double imageRatio = constraints.maxWidth >= 1400
+              ? 0.6
+              : (constraints.maxWidth >= 800 ? 0.5 : 0);
 
-    return Stack(
-      children: [
-        Scaffold(
-          body: Center(
-            child: Material(
-              color: Colors.transparent,
-              child: Container(
-                width: double.infinity,
-                height: double.infinity,
-                color: Colors.white,
-                child: SingleChildScrollView(
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: contentWidth),
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            const SizedBox(height: 140),
-                            Text(
-                              'Login',
-                              style: GoogleFonts.cabin(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                              textAlign: TextAlign.left,
-                            ),
-                            const SizedBox(height: 15),
-                            Text(
-                              'Welcome back! Let\'s have a meal today.',
-                              style: GoogleFonts.cabin(
-                                fontSize: 18,
-                                color: Colors.black,
-                              ),
-                            ),
-                            const SizedBox(height: 50),
-                            InputTextField(
-                              controller: emailController,
-                              hintText: 'Email or Username',
-                              obscureText: false,
-                            ).animate().fadeIn(delay: 300.ms, duration: 500.ms),
-                            const SizedBox(height: 20),
-                            InputTextField(
-                              controller: passwordController,
-                              hintText: 'Password',
-                              obscureText: true,
-                            ).animate().fadeIn(delay: 400.ms, duration: 500.ms),
-                            const SizedBox(height: 30),
-                            ElevatedButton(
-                              onPressed: loginUser,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFFB9A1C),
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 15),
-                              ),
-                              child: const Text(
-                                'Login',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ).animate().fadeIn(delay: 500.ms, duration: 500.ms),
-                            const SizedBox(height: 20),
-
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 25.0),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Divider(
-                                      thickness: 0.5,
-                                      color: Colors.grey[400],
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10.0),
-                                    child: Text(
-                                      'Or Continue with',
-                                      style: TextStyle(color: Colors.grey[700]),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Divider(
-                                      thickness: 0.5,
-                                      color: Colors.grey[400],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ).animate().fadeIn(delay: 600.ms, duration: 500.ms),
-
-                            const SizedBox(height: 20),
-
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pushReplacement(
-                                  FadePageRoute(
-                                    builder: (context) => const HomePage(),
-                                  ),
-                                );
-                              },
-                              child: const Text(
-                                'Continue as guest',
-                                style: TextStyle(color: Colors.blue),
-                              ),
-                            ).animate().fadeIn(delay: 700.ms, duration: 500.ms),
-                            const SizedBox(height: 20),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const RegisterPage(),
-                                  ),
-                                );
-                              },
-                              child: const Text('Don\'t have an account? Register'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
+          return Row(
+            children: [
+              if (imageRatio > 0)
+                Expanded(
+                  flex: (imageRatio * 100).round(),
+                  child: CommonBackground(fontSize: 48.0),
+                ),
+              Expanded(
+                flex: ((1 - imageRatio) * 100).round(),
+                child: Padding(
+                  padding: EdgeInsets.all(constraints.maxWidth * 0.05),
+                  child: _buildLoginForm(context),
                 ),
               ),
-            ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildLoginForm(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 400),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 70),
+            _buildHeader(),
+            const SizedBox(height: 50),
+            _buildTextField(
+                controller: emailControl,
+                icon: AppIcons.usernameIcon,
+                hintText: 'Enter Username'),
+            const SizedBox(height: 20),
+            _buildTextField(
+                controller: passwordControl,
+                icon: AppIcons.lockIcon,
+                hintText: 'Enter Password',
+                isPassword: true),
+            _buildForgotPasswordLink(),
+            const SizedBox(height: 20),
+            _buildSignInButton(),
+            const SizedBox(height: 20),
+            _buildDivider(),
+            const SizedBox(height: 20),
+            _buildGoogleSignInButton(),
+            const SizedBox(height: 20),
+            _buildSignUpLink(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Let\'s Sign In!',
+          style: montserratStyle.copyWith(
+            fontSize: 34.0,
+            fontWeight: FontWeight.w900,
+            color: AppColors.blueDarkColor,
           ),
         ),
+        const SizedBox(height: 30),
+        Text(
+          'Welcome Back! You\'ve been missed!',
+          style: catamaranStyle.copyWith(
+            fontSize: 18.0,
+            color: AppColors.textColor,
+          ),
+        ),
+      ],
+    );
+  }
 
-        SafeArea(
-          child: Opacity(
-            opacity: 1,
-            child: Container(
-              margin: const EdgeInsets.only(left: 25, top: 25),
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_rounded),
-                color: Colors.black54,
-                onPressed: () {
-                  Navigator.of(context).pushReplacement(
-                    FadePageRoute(
-                      builder: (context) => const LandingPage(),
-                    ),
-                  );
-                },
-              ),
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String icon,
+    required String hintText,
+    bool isPassword = false,
+  }) {
+    return Container(
+      height: 50.0,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16.0),
+        color: AppColors.whiteColor,
+      ),
+      child: TextFormField(
+        controller: controller,
+        obscureText: isPassword ? _isPasswordObscured : false,
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          prefixIcon: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child:
+                Image.asset(icon, width: 24, height: 24, fit: BoxFit.contain),
+          ),
+          suffixIcon: isPassword ? _buildPasswordVisibilityToggle() : null,
+          hintText: hintText,
+          hintStyle: hindMaduraiStyle.copyWith(
+            fontWeight: FontWeight.w400,
+            color: AppColors.blueDarkColor.withOpacity(0.5),
+            fontSize: 18.0,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPasswordVisibilityToggle() {
+    return IconButton(
+      icon: Icon(_isPasswordObscured ? Icons.visibility_off : Icons.visibility),
+      onPressed: () =>
+          setState(() => _isPasswordObscured = !_isPasswordObscured),
+    );
+  }
+
+  Widget _buildForgotPasswordLink() {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: TextButton(
+        onPressed: () {},
+        child: Text(
+          'Forgot Password?',
+          style: hindMaduraiStyle.copyWith(
+            fontSize: 16.0,
+            color: AppColors.mainBlueColor,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSignInButton() {
+    return Center(
+      child: signinbutton.ConfusingFilledButton(
+        onPressed: signInAction,
+        buttonText: 'Sign In',
+        width: 200.0,
+      ),
+    );
+  }
+
+  Widget _buildDivider() {
+    return const Row(
+      children: [
+        Expanded(
+            child:
+                Divider(color: Colors.grey, thickness: 1.0, endIndent: 10.0)),
+        Text("OR", style: TextStyle(color: Colors.grey, fontSize: 14.0)),
+        Expanded(
+            child: Divider(color: Colors.grey, thickness: 1.0, indent: 10.0)),
+      ],
+    );
+  }
+
+  Widget _buildGoogleSignInButton() {
+    return Center(
+      child: SignInGoogleButton(
+        onPressed: () {},
+        buttonText: 'Sign in with Google',
+        width: 250,
+      ),
+    );
+  }
+
+  Widget _buildSignUpLink(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          "Don't have an account?",
+          style: hindMaduraiStyle.copyWith(
+            fontSize: 16.0,
+            color: AppColors.textColor,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context)
+              .push(FadePageRoute(page: const RegisterScreen())),
+          child: Text(
+            'Sign Up',
+            style: hindMaduraiStyle.copyWith(
+              fontSize: 16.0,
+              color: AppColors.mainBlueColor,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),
