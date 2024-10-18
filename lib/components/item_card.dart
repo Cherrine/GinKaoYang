@@ -7,14 +7,16 @@ class ItemCard extends StatelessWidget {
   final String description;
   final String price;
   final String image;
+  final Function(String) onOrderConfirmed; // Callback for order confirmation
 
   const ItemCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.description,
     required this.price,
     required this.image,
-  }) : super(key: key);
+    required this.onOrderConfirmed, // Add this parameter
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -74,8 +76,15 @@ class ItemCard extends StatelessWidget {
                         ),
                       ),
                       ElevatedButton(
-                        onPressed: () => showPurchaseDialog(
-                            context, title, description, price),
+                        onPressed: () {
+                          // Show the purchase dialog and pass the onOrderConfirmed callback
+                          showPurchaseDialog(
+                            context,
+                            title,
+                            price,
+                            onOrderConfirmed,
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.black,
                           padding: const EdgeInsets.symmetric(

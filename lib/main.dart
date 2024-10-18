@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ginkhaoyang/screens/home_screen.dart';
-import 'package:ginkhaoyang/screens/login_screen.dart';
+
 
 void main() {
   runApp(const MyApp());

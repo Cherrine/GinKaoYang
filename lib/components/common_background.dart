@@ -6,7 +6,7 @@ import 'package:ginkhaoyang/utils/app_styles.dart';
 class CommonBackground extends StatelessWidget {
   final double fontSize;
 
-  const CommonBackground({Key? key, this.fontSize = 48.0}) : super(key: key);
+  const CommonBackground({super.key, this.fontSize = 48.0});
 
   @override
   Widget build(BuildContext context) {

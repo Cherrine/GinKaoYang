@@ -12,7 +12,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:ginkhaoyang/screens/home_screen.dart'; // Make sure to import your HomeScreen
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -36,7 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
               if (imageRatio > 0)
                 Expanded(
                   flex: (imageRatio * 100).round(),
-                  child: CommonBackground(fontSize: 48.0),
+                  child: const CommonBackground(fontSize: 48.0),
                 ),
               Expanded(
                 flex: ((1 - imageRatio) * 100).round(),
@@ -244,7 +244,7 @@ class _LoginScreenState extends State<LoginScreen> {
       // Handle error
       print("Google Sign-In Error: $error");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error signing in with Google')),
+        const SnackBar(content: Text('Error signing in with Google')),
       );
     }
   }

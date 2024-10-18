@@ -1,16 +1,28 @@
-// order_history.dart
 import 'package:flutter/material.dart';
 
 class OrderHistoryScreen extends StatelessWidget {
-  const OrderHistoryScreen({super.key});
+  final List<String> orders; // List to hold recent orders
+
+  const OrderHistoryScreen({Key? key, required this.orders}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        'Order History Content', // Replace this with your actual order history content
-        style: TextStyle(fontSize: 24),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Order History'),
       ),
+      body: orders.isEmpty
+          ? const Center(
+              child: Text('No orders yet.'),
+            )
+          : ListView.builder(
+              itemCount: orders.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(orders[index]), // Display each order
+                );
+              },
+            ),
     );
   }
 }

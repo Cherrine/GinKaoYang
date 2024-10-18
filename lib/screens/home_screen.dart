@@ -1,12 +1,10 @@
-// home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:ginkhaoyang/utils/app_styles.dart';
 import 'package:ginkhaoyang/widgets/sidebar.dart';
 import 'package:ginkhaoyang/widgets/responsive_widget.dart';
 import 'package:ginkhaoyang/screens/order_history.dart';
-import 'package:ginkhaoyang/components/item_card.dart'; // Import the ItemCard component
-import 'package:ginkhaoyang/utils/menu_items.dart'
-    as menuItems; // Import the menu items list
+import 'package:ginkhaoyang/components/item_card.dart';
+import 'package:ginkhaoyang/utils/menu_items.dart' as menu_items;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,26 +18,36 @@ class _HomeScreenState extends State<HomeScreen> {
   String appBarTitle = "Home"; // Default AppBar title
 
   late List<Map<String, dynamic>> popularItems; // Declare popularItems as late
+  List<String> recentOrders = []; // List to hold recent orders
 
   @override
   void initState() {
     super.initState();
-    popularItems = menuItems
-        .popularItems; // Initialize popularItems directly from the imported file
+    popularItems = menu_items.popularItems; // Initialize popularItems directly from the imported file
+  }
+
+  // Method to add an order to the recent orders list
+  void addOrder(String order) {
+    setState(() {
+      recentOrders.add(order); // Add the order to the list
+    });
   }
 
   // Widget to display the popular items
   Widget _buildPopularItems() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Column(       
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 16),
           Text(
             'Our Menu',
             style: montserratStyle.copyWith(
-                fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
           ),
           const SizedBox(height: 16),
           LayoutBuilder(
@@ -68,6 +76,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     description: popularItems[index]['description'],
                     price: popularItems[index]['price'],
                     image: popularItems[index]['image'],
+                    onOrderConfirmed: (order) {
+                      addOrder(order); // Call the method to add order
+                    },
                   );
                 },
               );
@@ -78,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Widget to create the banner
+  // Widget to create the banner (only shown on HomeScreen)
   Widget _buildBanner() {
     return Stack(
       children: [
@@ -87,33 +98,32 @@ class _HomeScreenState extends State<HomeScreen> {
           'assets/images/food_banner.jpeg',
           fit: BoxFit.cover,
           width: double.infinity,
-          height: 250, // Set a fixed height to make it consistent
+          height: 250,
         ),
         // Fade effect
         Container(
-          height: 250, // Same height as the image
+          height: 250,
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Colors.black54, // Black with opacity
-                Colors.transparent, // Transparent
+                Colors.black54,
+                Colors.transparent,
               ],
-              begin: Alignment.bottomCenter, // Start from bottom
-              end: Alignment.topCenter, // Fade upwards
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
             ),
           ),
         ),
         // Text overlay
         Positioned(
           left: 20,
-          bottom: 30, // Keep some space from the bottom of the banner
+          bottom: 30,
           child: Text(
             "What will you order today?",
             style: montserratStyle.copyWith(
-              // Apply your custom style
-              color: Colors.white, // White text color
-              fontSize: 24, // Font size
-              fontWeight: FontWeight.bold, // Bold font weight
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ),
@@ -121,43 +131,44 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
   // Example main content
   Widget _buildMainContent() {
     return CustomScrollView(
       slivers: [
-        SliverAppBar(
-          pinned: true,
-          backgroundColor: Colors.white,
-          expandedHeight: 250,
-          flexibleSpace: FlexibleSpaceBar(
-            background: _buildBanner(),
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.shopping_cart),
-              onPressed: () {
-                // Navigate to cart or other functionality
-              },
+        // Show the SliverAppBar and banner only on the Home route
+        if (selectedRoute == "home")
+          SliverAppBar(
+            pinned: true,
+            backgroundColor: Colors.white,
+            expandedHeight: 250,
+            flexibleSpace: FlexibleSpaceBar(
+              background: _buildBanner(),
             ),
-            IconButton(
-              icon: const Icon(Icons.account_circle),
-              onPressed: () {
-                // Navigate to profile or account settings
-              },
-            ),
-          ],
-          leading: ResponsiveWidget.isLargeScreen(context)
-              ? null
-              : Builder(
-                  builder: (context) => IconButton(
-                    icon: const Icon(Icons.menu),
-                    onPressed: () {
-                      Scaffold.of(context).openDrawer();
-                    },
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.shopping_cart),
+                onPressed: () {
+                  // Navigate to cart or other functionality
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.account_circle),
+                onPressed: () {
+                  // Navigate to profile or account settings
+                },
+              ),
+            ],
+            leading: ResponsiveWidget.isLargeScreen(context)
+                ? null
+                : Builder(
+                    builder: (context) => IconButton(
+                      icon: const Icon(Icons.menu),
+                      onPressed: () {
+                        Scaffold.of(context).openDrawer();
+                      },
+                    ),
                   ),
-                ),
-        ),
+          ),
         SliverToBoxAdapter(
           child: Builder(
             builder: (context) {
@@ -165,11 +176,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 case "home":
                   return _buildPopularItems();
                 case "order_history":
-                  return const OrderHistoryScreen();
+                  return OrderHistoryScreen(orders: recentOrders); // Pass recent orders here
                 default:
                   return const Center(
-                      child: Text('Select a Menu Item',
-                          style: TextStyle(fontSize: 24)));
+                    child: Text('Select a Menu Item', style: TextStyle(fontSize: 24)),
+                  );
               }
             },
           ),
@@ -179,35 +190,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Large screen layout with permanent sidebar
-  Widget _buildLargeScreen(BuildContext context) {
-    return Row(
-      children: [
-        Sidebar(
-          isPermanent: true,
-          onNavigate: (routeName) {
-            setState(() {
-              selectedRoute = routeName; // Update the selected route
-              appBarTitle = routeName == "home"
-                  ? "Home"
-                  : "Order History"; // Update AppBar title
-            });
-          },
-        ),
-        Expanded(
-          child: _buildMainContent(),
-        ),
-      ],
-    );
-  }
-
   Widget _buildDrawerScreen(BuildContext context) {
     return Scaffold(
       drawer: Sidebar(
         onNavigate: (routeName) {
           Navigator.of(context).pop(); // Close the drawer
           setState(() {
-            selectedRoute = routeName;
-            appBarTitle = routeName == "home" ? "Home" : "Order History";
+            selectedRoute = routeName; // Update selected route
+            appBarTitle = routeName == "home" ? "Home" : "Order History"; // Update title
           });
         },
       ),
@@ -224,8 +214,8 @@ class _HomeScreenState extends State<HomeScreen> {
             isPermanent: true,
             onNavigate: (routeName) {
               setState(() {
-                selectedRoute = routeName;
-                appBarTitle = routeName == "home" ? "Home" : "Order History";
+                selectedRoute = routeName; // Update selected route
+                appBarTitle = routeName == "home" ? "Home" : "Order History"; // Update title
               });
             },
           ),

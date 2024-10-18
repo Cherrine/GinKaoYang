@@ -1,25 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:ginkhaoyang/screens/thank_you_screen.dart';
 
-void showPurchaseDialog(BuildContext context, String title, String description, String price) {
+void showPurchaseDialog(BuildContext context, String foodName, String price, Function addOrder) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text('Purchase $title'),
+        title: Text('Purchase $foodName'),
         content: Column(
-          mainAxisSize: MainAxisSize.min, // Makes the column take minimum height
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 8), // Space at the top (removed image)
-            Text(description), // Shows the description
-            const SizedBox(height: 8), // Spacing between the description and price
-            Text('Price: $price'), // Shows the price
+            const SizedBox(height: 8),
+            Text('Do you want to purchase $foodName?'),
+            const SizedBox(height: 8),
+            Text('Price: $price'),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () {
-              // Add your purchase logic here
-              Navigator.of(context).pop(); // Close the dialog
+              Navigator.of(context).pop(); // Close the purchase dialog
+              addOrder(foodName); // Add the food item to recent orders
+              // Show thank you dialog
+              showThankYouDialog(context, foodName);
             },
             child: const Text('Confirm Purchase'),
           ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-// TODO: add flutter_svg to pubspec.yaml
 import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeScreen extends StatelessWidget {

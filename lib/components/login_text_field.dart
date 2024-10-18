@@ -11,13 +11,13 @@ class LoginTextField extends StatelessWidget {
   final VoidCallback? onToggleVisibility;
 
   const LoginTextField({
-    Key? key,
+    super.key,
     required this.label,
     required this.hint,
     this.isPassword = false,
     this.obscureText = false,
     this.onToggleVisibility,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,7 @@ class LoginTextField extends StatelessWidget {
             color: AppColors.blueDarkColor,
           ),
         ),
-        SizedBox(height: 6),
+        const SizedBox(height: 6),
         Container(
           height: 50.0,
           decoration: BoxDecoration(
