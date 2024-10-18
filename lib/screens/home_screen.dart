@@ -89,6 +89,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // Widget to display the order history screen properly
+  Widget _buildOrderHistory() {
+    return OrderHistoryScreen(orders: recentOrders); // Use a regular scaffold for order history
+  }
+
   // Widget to create the banner (only shown on HomeScreen)
   Widget _buildBanner() {
     return Stack(
@@ -135,7 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildMainContent() {
     return CustomScrollView(
       slivers: [
-        // Show the SliverAppBar and banner only on the Home route
+        // Only show the SliverAppBar and banner on the Home route
         if (selectedRoute == "home")
           SliverAppBar(
             pinned: true,
@@ -176,10 +181,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 case "home":
                   return _buildPopularItems();
                 case "order_history":
-                  return OrderHistoryScreen(orders: recentOrders); // Pass recent orders here
+                  return _buildOrderHistory(); // Updated OrderHistoryScreen
                 default:
                   return const Center(
-                    child: Text('Select a Menu Item', style: TextStyle(fontSize: 24)),
+                    child: Text(
+                      'Select a Menu Item',
+                      style: TextStyle(fontSize: 24),
+                    ),
                   );
               }
             },

@@ -1,7 +1,5 @@
-// sidebar.dart
 import 'package:flutter/material.dart';
 import 'package:ginkhaoyang/screens/login_screen.dart';
-import 'package:ginkhaoyang/utils/app_styles.dart';
 
 class Sidebar extends StatefulWidget {
   final bool isPermanent;
@@ -64,99 +62,48 @@ class _SidebarState extends State<Sidebar> {
     return Padding(
       padding: const EdgeInsets.only(left: 4.0),
       child: IconButton(
-        icon: const Icon(Icons.menu, color: Colors.white),
-        onPressed: _toggleSidebar,
+        icon: const Icon(Icons.menu),
+        color: Colors.white,
+        onPressed: () {
+          setState(() {
+            isCollapsed = !isCollapsed;
+          });
+        },
       ),
     );
   }
 
-Widget _buildHeaderTitle() {
-  return Expanded(
-    child: Padding(
-      padding: const EdgeInsets.only(left: 10.0),
-      child: AnimatedOpacity(
-        opacity: isCollapsed ? 0 : 1,
-        duration: const Duration(milliseconds: 200),
-        child: Image.asset(
-          'assets/images/namedlogo.png', // Replace with your image path
-          height: 30,  // Adjust the height to make it smaller
-          width: 30,   // You can also control the width if needed
-          fit: BoxFit.contain, // Ensure the image fits within the space
-        ),
-      ),
-    ),
-  );
-}
-
-  Widget _buildLogoutButton() {
+  Widget _buildHeaderTitle() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white),
-            onPressed: _handleLogout,
-          ),
-          // Wrap the Text in an InkWell or GestureDetector
-          InkWell(
-            onTap: _handleLogout, // Call _handleLogout when tapped
-            child: AnimatedOpacity(
-              opacity: isCollapsed ? 0 : 1,
-              duration: const Duration(milliseconds: 200),
-              child: Text(
-                'Logout',
-                style: catamaranStyle.copyWith(color: Colors.white),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ),
-        ],
+      child: Image.asset(
+        'assets/images/namedlogo.png',
+        height: 40,  // Set the height for the image
+        fit: BoxFit.contain,  // Adjust the fit to ensure the image scales properly
       ),
     );
   }
 
-  Widget _buildMenuItem(IconData icon, String title, String routeName) {
+  Widget _buildMenuItem(IconData icon, String title, String route) {
     return ListTile(
       leading: Icon(icon, color: Colors.white),
-      title: AnimatedOpacity(
-        opacity: isCollapsed ? 0 : 1,
-        duration: const Duration(milliseconds: 200),
-        child: Text(
-          title,
-          style: hindMaduraiStyle.copyWith(color: Colors.white),
-          overflow: TextOverflow.ellipsis,
-        ),
-      ),
+      title: isCollapsed ? null : Text(title, style: const TextStyle(color: Colors.white)),
       onTap: () {
-        _navigateTo(routeName); // Call navigation on tap
+        widget.onNavigate(route); // Call the onNavigate callback
       },
-      hoverColor: Colors.white24,
     );
   }
 
-  void _toggleSidebar() {
-    setState(() {
-      isCollapsed = !isCollapsed;
-    });
-  }
-
-  void _navigateTo(String routeName) {
-    widget.onNavigate(routeName); // Call the callback with the route name
-    if (isCollapsed) {
-      _toggleSidebar(); // Toggle sidebar if collapsed
-    }
-  }
-
-  void _handleLogout() {
-    // Here you should clear the user session, e.g., remove tokens
-    // For example, if you're using shared preferences:
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
-    // await prefs.remove('token'); // or whatever key you are using
-
-    // Navigate back to the LoginScreen
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => const LoginScreen()),
-      (Route<dynamic> route) => false, // Remove all previous routes
+  Widget _buildLogoutButton() {
+    return ListTile(
+      leading: const Icon(Icons.logout, color: Colors.white),
+      title: isCollapsed ? null : const Text("Logout", style: TextStyle(color: Colors.white)),
+      onTap: () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+      },
     );
   }
 }
