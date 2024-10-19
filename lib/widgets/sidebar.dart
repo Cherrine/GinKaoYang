@@ -3,12 +3,12 @@ import 'package:ginkhaoyang/screens/login_screen.dart';
 
 class Sidebar extends StatefulWidget {
   final bool isPermanent;
-  final Function(String) onNavigate; // Callback to handle navigation
+  final Function(String) onNavigate;
 
   const Sidebar({
     super.key,
     this.isPermanent = false,
-    required this.onNavigate, // Accept the callback
+    required this.onNavigate,
   });
 
   @override
@@ -33,8 +33,8 @@ class _SidebarState extends State<Sidebar> {
               child: ListView(
                 children: [
                   _buildMenuItem(Icons.home, "Home", "home"),
-                  _buildMenuItem(Icons.history, "Order History", "order_history"),
-                  // Add more menu items here
+                  _buildMenuItem(
+                      Icons.history, "Order History", "order_history"),
                 ],
               ),
             ),
@@ -75,11 +75,11 @@ class _SidebarState extends State<Sidebar> {
 
   Widget _buildHeaderTitle() {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.only(left: 16.0),
       child: Image.asset(
         'assets/images/namedlogo.png',
-        height: 40,  // Set the height for the image
-        fit: BoxFit.contain,  // Adjust the fit to ensure the image scales properly
+        height: 30, // Adjusted height for the logo
+        fit: BoxFit.contain,
       ),
     );
   }
@@ -87,9 +87,11 @@ class _SidebarState extends State<Sidebar> {
   Widget _buildMenuItem(IconData icon, String title, String route) {
     return ListTile(
       leading: Icon(icon, color: Colors.white),
-      title: isCollapsed ? null : Text(title, style: const TextStyle(color: Colors.white)),
+      title: isCollapsed
+          ? null
+          : Text(title, style: const TextStyle(color: Colors.white)),
       onTap: () {
-        widget.onNavigate(route); // Call the onNavigate callback
+        widget.onNavigate(route);
       },
     );
   }
@@ -97,7 +99,9 @@ class _SidebarState extends State<Sidebar> {
   Widget _buildLogoutButton() {
     return ListTile(
       leading: const Icon(Icons.logout, color: Colors.white),
-      title: isCollapsed ? null : const Text("Logout", style: TextStyle(color: Colors.white)),
+      title: isCollapsed
+          ? null
+          : const Text("Logout", style: TextStyle(color: Colors.white)),
       onTap: () {
         Navigator.pushReplacement(
           context,
