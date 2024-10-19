@@ -18,25 +18,29 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void addOrder(String order) {
     setState(() {
-      recentOrders.add(order);
+      // Add order only if it's not already in the list
+      if (!recentOrders.contains(order)) {
+        recentOrders.add(order);
+      }
     });
   }
 
-    Widget _buildMainContent() {
-      switch (selectedRoute) {
-        case "home":
-          return Column(
-            children: [
-              _buildHeader(), // Include the header at the top
-              Expanded(child: _buildPopularItems()), // Make the items expand
-            ],
-          );
-        case "order_history":
-          return OrderHistoryScreen(orders: recentOrders);
-        default:
-          return const Center(child: Text('Select a Menu Item'));
-      }
+  Widget _buildMainContent() {
+    switch (selectedRoute) {
+      case "home":
+        return Column(
+          children: [
+            _buildHeader(), // Include the header at the top
+            Expanded(child: _buildPopularItems()), // Make the items expand
+          ],
+        );
+      case "order_history":
+        return OrderHistoryScreen(orders: recentOrders);
+      default:
+        return const Center(child: Text('Select a Menu Item'));
     }
+  }
+
   Widget _buildHeader() {
     return Container(
       margin: const EdgeInsets.only(bottom: 16), // Space between header and items
@@ -58,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
           // Text overlay
           Container(
             padding: const EdgeInsets.all(8), // Padding around the text
-            child:  Text(
+            child: Text(
               "What will you order today?",
               style: montserratStyle.copyWith(
                 fontSize: 24,
@@ -72,8 +76,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-   Widget _buildPopularItems() {
-    const popularItems = menu_items.popularItems;
+  Widget _buildPopularItems() {
+    final popularItems = menu_items.popularItems;
 
     return GridView.builder(
       padding: const EdgeInsets.all(16),
@@ -96,8 +100,6 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {
