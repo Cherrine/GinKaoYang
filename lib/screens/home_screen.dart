@@ -73,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
    Widget _buildPopularItems() {
-    final popularItems = menu_items.popularItems;
+    const popularItems = menu_items.popularItems;
 
     return GridView.builder(
       padding: const EdgeInsets.all(16),
