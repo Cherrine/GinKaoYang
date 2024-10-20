@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:ginkhaoyang/utils/app_colors.dart';
-import 'package:ginkhaoyang/utils/app_icons.dart';
-import 'package:ginkhaoyang/utils/app_styles.dart';
-import 'package:ginkhaoyang/components/sign_in_google_button.dart';
-import 'package:ginkhaoyang/components/confusing_filled_button.dart' as signinbutton;
-import 'package:ginkhaoyang/screens/register_screen.dart';
-import 'package:ginkhaoyang/components/common_background.dart';
-import 'package:ginkhaoyang/utils/fade_page_route.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:ginkhaoyang/screens/home_screen.dart'; // Make sure to import your HomeScreen
+import 'package:ginkhaoyang/backend/Account.dart';
+import 'package:ginkhaoyang/backend/User.dart';
+import 'package:ginkhaoyang/screens/home_screen.dart';
+import '../utils/app_colors.dart';
+import '../utils/app_icons.dart';
+import '../utils/app_styles.dart';
+import '../components/sign_in_google_button.dart';
+import '../components/confusing_filled_button.dart' as signinbutton;
+import '../screens/register_screen.dart';
+import '../components/common_background.dart';
+import '../utils/fade_page_route.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -20,6 +20,30 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _isPasswordObscured = true;
+  final TextEditingController emailControl = TextEditingController();
+  final TextEditingController passwordControl = TextEditingController();
+  final Account account = Account();
+  String? uid;
+
+  Future<void> signInAction() async {
+    uid = await account.login(
+      emailControl.text,
+      passwordControl.text,
+    );
+    User currentuser = User(uid!);
+    await currentuser.fetchUserData();
+    if (uid != null) {
+      print('login');
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => HomeScreen(currentuser)),
+      );
+    } else {
+      print('fail');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error signing in with Google')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
               if (imageRatio > 0)
                 Expanded(
                   flex: (imageRatio * 100).round(),
-                  child: const CommonBackground(fontSize: 48.0),
+                  child: CommonBackground(fontSize: 48.0),
                 ),
               Expanded(
                 flex: ((1 - imageRatio) * 100).round(),
@@ -63,9 +87,16 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(height: 70),
             _buildHeader(),
             const SizedBox(height: 50),
-            _buildTextField(icon: AppIcons.usernameIcon, hintText: 'Enter Username'),
+            _buildTextField(
+                controller: emailControl,
+                icon: AppIcons.usernameIcon,
+                hintText: 'Enter Username'),
             const SizedBox(height: 20),
-            _buildTextField(icon: AppIcons.lockIcon, hintText: 'Enter Password', isPassword: true),
+            _buildTextField(
+                controller: passwordControl,
+                icon: AppIcons.lockIcon,
+                hintText: 'Enter Password',
+                isPassword: true),
             _buildForgotPasswordLink(),
             const SizedBox(height: 20),
             _buildSignInButton(),
@@ -106,6 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildTextField({
+    required TextEditingController controller,
     required String icon,
     required String hintText,
     bool isPassword = false,
@@ -117,12 +149,14 @@ class _LoginScreenState extends State<LoginScreen> {
         color: AppColors.whiteColor,
       ),
       child: TextFormField(
+        controller: controller,
         obscureText: isPassword ? _isPasswordObscured : false,
         decoration: InputDecoration(
           border: InputBorder.none,
           prefixIcon: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            child: Image.asset(icon, width: 24, height: 24, fit: BoxFit.contain),
+            child:
+                Image.asset(icon, width: 24, height: 24, fit: BoxFit.contain),
           ),
           suffixIcon: isPassword ? _buildPasswordVisibilityToggle() : null,
           hintText: hintText,
@@ -139,7 +173,8 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildPasswordVisibilityToggle() {
     return IconButton(
       icon: Icon(_isPasswordObscured ? Icons.visibility_off : Icons.visibility),
-      onPressed: () => setState(() => _isPasswordObscured = !_isPasswordObscured),
+      onPressed: () =>
+          setState(() => _isPasswordObscured = !_isPasswordObscured),
     );
   }
 
@@ -163,7 +198,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildSignInButton() {
     return Center(
       child: signinbutton.ConfusingFilledButton(
-        onPressed: () {}, // Implement your sign in logic here if needed
+        onPressed: signInAction,
         buttonText: 'Sign In',
         width: 200.0,
       ),
@@ -173,9 +208,12 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildDivider() {
     return const Row(
       children: [
-        Expanded(child: Divider(color: Colors.grey, thickness: 1.0, endIndent: 10.0)),
+        Expanded(
+            child:
+                Divider(color: Colors.grey, thickness: 1.0, endIndent: 10.0)),
         Text("OR", style: TextStyle(color: Colors.grey, fontSize: 14.0)),
-        Expanded(child: Divider(color: Colors.grey, thickness: 1.0, indent: 10.0)),
+        Expanded(
+            child: Divider(color: Colors.grey, thickness: 1.0, indent: 10.0)),
       ],
     );
   }
@@ -183,7 +221,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildGoogleSignInButton() {
     return Center(
       child: SignInGoogleButton(
-        onPressed: _signInWithGoogle, // Call the sign-in method
+        onPressed: () {},
         buttonText: 'Sign in with Google',
         width: 250,
       ),
@@ -203,7 +241,8 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
         TextButton(
-          onPressed: () => Navigator.of(context).push(FadePageRoute(page: const RegisterScreen())),
+          onPressed: () => Navigator.of(context)
+              .push(FadePageRoute(page: const RegisterScreen())),
           child: Text(
             'Sign Up',
             style: hindMaduraiStyle.copyWith(
@@ -215,37 +254,5 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ],
     );
-  }
-
-  // Method to handle Google Sign-In
-  Future<void> _signInWithGoogle() async {
-    try {
-      // Trigger the authentication flow
-      final GoogleSignIn googleSignIn = GoogleSignIn();
-      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-
-      // Obtain the auth details from the request
-      final GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
-
-      // Create a new credential
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      // This token can be used to authenticate with Firebase
-      await FirebaseAuth.instance.signInWithCredential(credential);
-
-      // Redirect to HomeScreen after successful sign in
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomeScreen()), // Adjust the import as necessary
-      );
-    } catch (error) {
-      // Handle error
-      print("Google Sign-In Error: $error");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error signing in with Google')),
-      );
-    }
   }
 }

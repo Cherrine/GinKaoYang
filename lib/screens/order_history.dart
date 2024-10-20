@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:ginkhaoyang/utils/menu_items.dart' as menu_items;
+import 'package:ginkhaoyang/backend/AllOrder.dart';
+import 'package:ginkhaoyang/backend/User.dart';
 import 'package:ginkhaoyang/utils/app_styles.dart';
-import 'package:intl/intl.dart';
 
 class OrderHistoryScreen extends StatelessWidget {
-  final List<String>? orders;
+  final User user;
 
-  const OrderHistoryScreen({Key? key, this.orders}) : super(key: key);
+  const OrderHistoryScreen({Key? key, required this.user}) : super(key: key);
+
+  Future<List<OrderData>> fetchOrders() async {
+    Allorder allOrder = Allorder();
+    List<OrderData> orders = await allOrder.getAllorder(user);
+    return orders;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,8 +21,15 @@ class OrderHistoryScreen extends StatelessWidget {
         title: Text('Order History', style: montserratStyle.copyWith(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.orange,
       ),
-      body: orders == null || orders!.isEmpty
-          ? Center(
+      body: FutureBuilder<List<OrderData>>(
+        future: fetchOrders(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -33,36 +46,32 @@ class OrderHistoryScreen extends StatelessWidget {
                   ),
                 ],
               ),
-            )
-          : ListView.builder(
-              itemCount: orders!.length,
+            );
+          } else {
+            final orders = snapshot.data!;
+            return ListView.builder(
+              itemCount: orders.length,
               itemBuilder: (context, index) {
-                final orderName = orders![index];
-                final menuItem = menu_items.popularItems.firstWhere(
-                  (item) => item['title'] == orderName,
-                  orElse: () => {'title': orderName, 'price': 'N/A', 'image': 'assets/images/placeholder.jpg'},
-                );
-                final orderTime = DateTime.now().subtract(Duration(minutes: index * 10));
+                final order = orders[index];
 
                 return Card(
                   margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: ListTile(
                     leading: CircleAvatar(
-                      backgroundImage: AssetImage(menuItem['image']),
+                      backgroundImage: AssetImage('assets/images/placeholder.jpg'),
                     ),
-                    title: Text(orderName, style: montserratStyle.copyWith(fontWeight: FontWeight.bold)),
+                    title: Text(order.menu, style: montserratStyle.copyWith(fontWeight: FontWeight.bold)),
                     subtitle: Text(
-                      'Ordered on ${DateFormat('MMM d, yyyy HH:mm').format(orderTime)}',
+                      'Order ID: ${order.orderId}, Queue: ${order.queueNumber ?? 'N/A'}',
                       style: montserratStyle.copyWith(color: Colors.grey[600]),
-                    ),
-                    trailing: Text(
-                      menuItem['price'],
-                      style: montserratStyle.copyWith(fontWeight: FontWeight.bold, color: Colors.green),
                     ),
                   ),
                 );
               },
-            ),
+            );
+          }
+        },
+      ),
     );
   }
 }

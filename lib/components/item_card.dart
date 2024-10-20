@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ginkhaoyang/backend/User.dart';
 import 'package:ginkhaoyang/widgets/purchase_dialog.dart';
 import 'package:ginkhaoyang/utils/app_styles.dart';
 
@@ -8,6 +9,7 @@ class ItemCard extends StatelessWidget {
   final String price;
   final String image;
   final Function(String) onOrderConfirmed; // Callback for order confirmation
+  final User cuser;
 
   const ItemCard({
     super.key,
@@ -15,9 +17,11 @@ class ItemCard extends StatelessWidget {
     required this.description,
     required this.price,
     required this.image,
-    required this.onOrderConfirmed, // Add this parameter
+    required this.onOrderConfirmed,
+    required this.cuser, // Add this parameter
   });
 
+  User get cuuser => cuser;
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -82,11 +86,12 @@ class ItemCard extends StatelessWidget {
                             context,
                             title,
                             price,
+                            cuser,
                             onOrderConfirmed,
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
+                          backgroundColor: Colors.black,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 2),
                           minimumSize: Size.zero,
@@ -94,7 +99,8 @@ class ItemCard extends StatelessWidget {
                         ),
                         child: Text(
                           'Buy',
-                          style: montserratStyle.copyWith(fontSize: 20, color: Colors.white),
+                          style: montserratStyle.copyWith(
+                              fontSize: 20, color: Colors.white),
                         ),
                       ),
                     ],
